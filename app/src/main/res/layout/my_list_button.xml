@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+android:layout_width="match_parent"
+android:layout_height="wrap_content"
+android:orientation="horizontal"
+    android:layout_alignParentTop="true">
+
+
+<TextView
+    android:id="@+id/textviewFirm"
+    android:layout_width="140dp"
+    android:layout_height="wrap_content"
+    android:fontFamily="@font/abeezee"
+    android:gravity="center_vertical"
+    android:minHeight="?android:attr/listPreferredItemHeight"
+    android:paddingLeft="2dip"
+    android:textColor="#3c12d7"
+    android:textSize="16sp"/>
+
+<TextView
+    android:id="@+id/textviewType"
+    android:layout_width="100dp"
+    android:layout_height="wrap_content"
+    android:fontFamily="@font/abeezee"
+    android:gravity="center_vertical"
+    android:minHeight="?android:attr/listPreferredItemHeight"
+    android:paddingLeft="2dip"
+    android:textColor="#3c12d7"
+    android:textSize="16sp"/>
+    <TextView
+        android:id="@+id/textviewFrom"
+        android:layout_width="170dp"
+        android:layout_height="wrap_content"
+        android:fontFamily="@font/abeezee"
+        android:gravity="center_vertical"
+        android:minHeight="?android:attr/listPreferredItemHeight"
+        android:paddingLeft="2dip"
+        android:textColor="#3c12d7"
+        android:textSize="16sp"/>
+
+<TextView
+    android:id="@+id/textviewTo"
+    android:layout_width="170dp"
+    android:layout_height="wrap_content"
+    android:fontFamily="@font/abeezee"
+    android:gravity="center_vertical"
+    android:minHeight="?android:attr/listPreferredItemHeight"
+    android:paddingLeft="2dip"
+    android:textColor="#3c12d7"
+    android:textSize="16sp"/>
+
+<Button
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_alignParentEnd="true"
+    android:width="100dp"
+    android:height="20dp"
+    android:background="@drawable/btn_sign_in"
+    android:onClick="onAddClick"
+
+    android:text="Add"
+    android:textColor="@color/white" />
+
+</LinearLayout>
+

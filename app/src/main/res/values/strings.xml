@@ -1,0 +1,10 @@
+<resources>
+    <string name="app_name">DeliverAll!</string>
+    <string name="app_in_name">DeliverAll!</string>
+    <string name="app_after_name">Авторизация</string>
+    <string name="app_bottom_name">Войдите в свой аккаунт</string>
+    <string name="signIn">Войти</string>
+    <string name="register">Зарегистрироваться</string>
+
+
+</resources>
