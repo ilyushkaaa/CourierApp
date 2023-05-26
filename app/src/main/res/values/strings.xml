@@ -5,6 +5,8 @@
     <string name="app_bottom_name">Войдите в свой аккаунт</string>
     <string name="signIn">Войти</string>
     <string name="register">Зарегистрироваться</string>
+    <string name="google_client_id">620819643210-mnia6tc700ad2nbvhgf38gt803cddqgj.apps.googleusercontent.com</string>
+
 
 
 </resources>

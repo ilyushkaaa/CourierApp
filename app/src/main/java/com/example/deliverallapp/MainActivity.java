@@ -1,5 +1,12 @@
 package com.example.deliverallapp;
 
+import static androidx.constraintlayout.helper.widget.MotionEffect.TAG;
+
+import androidx.activity.result.ActivityResult;
+import androidx.activity.result.ActivityResultCallback;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.annotation.SuppressLint;
@@ -10,6 +17,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
@@ -19,6 +27,17 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.auth.api.Auth;
+import com.google.android.gms.auth.api.signin.GoogleSignIn;
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
+import com.google.android.gms.auth.api.signin.GoogleSignInClient;
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
+import com.google.android.gms.auth.api.signin.GoogleSignInResult;
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.SignInButton;
+import com.google.android.gms.common.api.ApiException;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.tasks.Task;
 import com.google.android.material.snackbar.Snackbar;
 
 import java.io.EOFException;
@@ -38,7 +57,14 @@ import java.io.ObjectOutputStream;
 // !!!регистрация через гугл через апи(возможно недоступно)
 // (сделано)убрать дофига обращений в мэйнактивити и все эти статические переменные закинуть в отдельный класс
 public class MainActivity extends AppCompatActivity {
-    Button btnSignIn, btnRegister;
+    private Button btnSignIn, btnRegister;
+    private String emailGoogle;
+    private EditText email;
+    private View rg_window;
+    private static final int RC_SIGN_IN = 9001;
+    private GoogleSignInClient mGoogleSignInClient;
+    private GoogleApiClient mGoogleApiClient;
+    private ActivityResultLauncher<Intent> signInLauncher;
     RelativeLayout root;
     String pathFile = "courrrrrrrr.bin";
     private Firm firm1;
@@ -127,6 +153,12 @@ public class MainActivity extends AppCompatActivity {
         oos.close();
         fos.close();
     }
+   /* @Override
+    protected void onStart() {
+        GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(this);
+        //updateUI(account);
+        super.onStart();
+    }*/
     private void receiveInfo() throws IOException, ClassNotFoundException {
         File file = new File(getFilesDir(), pathFile);
         if(file.length() == 0){
@@ -231,7 +263,46 @@ public class MainActivity extends AppCompatActivity {
 
 
 
+
+
+
     }
+    private void handleSignInResult(GoogleSignInResult result) {
+        if (result.isSuccess()) {
+            GoogleSignInAccount account = result.getSignInAccount();
+            // Получите информацию о пользователе, вошедшем через аккаунт Google
+            emailGoogle = account.getEmail();
+            email.setText(emailGoogle);
+
+
+        } else {
+
+            Toast.makeText(MainActivity.this, "Ошибка входа в Google",
+                    Toast.LENGTH_LONG) .show();
+
+        }
+    }
+
+    private void signIn() {
+        Intent signInIntent = Auth.GoogleSignInApi.getSignInIntent(mGoogleApiClient);
+        startActivityForResult(signInIntent, RC_SIGN_IN);
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (requestCode == RC_SIGN_IN) {
+            GoogleSignInResult result = Auth.GoogleSignInApi.getSignInResultFromIntent(data);
+            handleSignInResult(result);
+            System.out.println("yyyyyyyyyyyyyyyyyyyyyyyyyyyy");
+        }
+        else{
+            System.out.println("wwwwwwwwwwwwwwwwwwwwwwwwwwww");
+        }
+    }
+
+
     public boolean inCorrectData(EditText pass, EditText email){
         if (TextUtils.isEmpty(pass.getText().toString()) || pass.getText().toString().
                 length() < 8){
@@ -259,14 +330,34 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void showSignInWindow() {
+        GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                .requestIdToken(getString(R.string.google_client_id))
+                .requestEmail()
+                .build();
+
+        mGoogleSignInClient = GoogleSignIn.getClient(this, gso);
+
+       /* SignInButton signInButton = rg_window.findViewById(R.id.sign_in_button);
+        signInButton.setSize(SignInButton.SIZE_STANDARD);*/
+
+
+        mGoogleApiClient = new GoogleApiClient.Builder(this)
+                .enableAutoManage(this, connectionResult -> {
+                    // Обработайте событие ошибки подключения
+                })
+                .addApi(Auth.GOOGLE_SIGN_IN_API, gso)
+                .build();
+
+
+
         AlertDialog.Builder dialog = new AlertDialog.Builder(this);
         dialog.setTitle("Вход");
         dialog.setMessage("Введите пароль и эл. почту вашего аккаунта");
         LayoutInflater inflater = LayoutInflater.from(this);
-        View rg_window = inflater.inflate(R.layout.entry_window, null);
+        rg_window = inflater.inflate(R.layout.entry_window, null);
         dialog.setView(rg_window);
 
-        EditText email = rg_window.findViewById(R.id.email_field);
+        email = rg_window.findViewById(R.id.email_field);
         EditText pass = rg_window.findViewById(R.id.pass_field);
 
         dialog.setNegativeButton("Отменить", new DialogInterface.OnClickListener() {
@@ -289,6 +380,19 @@ public class MainActivity extends AppCompatActivity {
             }
         });
         dialog.show();
+
+        SignInButton signInButton = rg_window.findViewById(R.id.sign_in_button);
+        signInButton.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View v){
+                signIn();
+
+            }
+        });
+
+
+
+
     }
 
     private boolean badPassword(EditText pass){
@@ -398,5 +502,6 @@ public class MainActivity extends AppCompatActivity {
         });
         dialog.show();
     }
+
 
 }
