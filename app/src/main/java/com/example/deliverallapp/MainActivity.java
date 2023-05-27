@@ -263,6 +263,23 @@ public class MainActivity extends AppCompatActivity {
                     300);
         }
 
+        GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                .requestIdToken(getString(R.string.web_client_id))
+                .requestEmail()
+                .build();
+
+        mGoogleSignInClient = GoogleSignIn.getClient(this, gso);
+
+       /* SignInButton signInButton = rg_window.findViewById(R.id.sign_in_button);
+        signInButton.setSize(SignInButton.SIZE_STANDARD);*/
+
+
+        mGoogleApiClient = new GoogleApiClient.Builder(this)
+                .enableAutoManage(this, connectionResult -> {
+                    // Обработайте событие ошибки подключения
+                })
+                .addApi(Auth.GOOGLE_SIGN_IN_API, gso)
+                .build();
 
 
 
@@ -343,23 +360,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void showSignInWindow() {
         signIn = true;
-        GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-                .requestIdToken(getString(R.string.web_client_id))
-                .requestEmail()
-                .build();
 
-        mGoogleSignInClient = GoogleSignIn.getClient(this, gso);
-
-       /* SignInButton signInButton = rg_window.findViewById(R.id.sign_in_button);
-        signInButton.setSize(SignInButton.SIZE_STANDARD);*/
-
-
-        mGoogleApiClient = new GoogleApiClient.Builder(this)
-                .enableAutoManage(this, connectionResult -> {
-                    // Обработайте событие ошибки подключения
-                })
-                .addApi(Auth.GOOGLE_SIGN_IN_API, gso)
-                .build();
 
 
 
@@ -457,23 +458,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void showRegisterWindow() {
         signIn = false;
-        GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-                .requestIdToken(getString(R.string.web_client_id))
-                .requestEmail()
-                .build();
 
-        mGoogleSignInClient = GoogleSignIn.getClient(this, gso);
-
-       /* SignInButton signInButton = rg_window.findViewById(R.id.sign_in_button);
-        signInButton.setSize(SignInButton.SIZE_STANDARD);*/
-
-
-        mGoogleApiClient = new GoogleApiClient.Builder(this)
-                .enableAutoManage(this, connectionResult -> {
-                    // Обработайте событие ошибки подключения
-                })
-                .addApi(Auth.GOOGLE_SIGN_IN_API, gso)
-                .build();
         AlertDialog.Builder dialog = new AlertDialog.Builder(this);
         dialog.setTitle("Регистрация");
         dialog.setMessage("Введите данные для регистрации");
