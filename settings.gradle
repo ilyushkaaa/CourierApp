@@ -1,16 +1,18 @@
 pluginManagement {
     repositories {
+        jcenter()
+        maven { url 'https://maven.google.com' }
+        mavenLocal()
         google()
-        mavenCentral()
-        gradlePluginPortal()
     }
 }
-dependencyResolutionManagement {
+/*dependencyResolutionManagement {
     repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
     repositories {
         google()
         mavenCentral()
     }
-}
+}*/
 rootProject.name = "DeliverAllApp"
 include ':app'
+

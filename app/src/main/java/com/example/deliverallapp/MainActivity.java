@@ -28,6 +28,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.auth.api.Auth;
+import com.google.android.gms.auth.api.identity.BeginSignInRequest;
+import com.google.android.gms.auth.api.identity.SignInClient;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
@@ -54,15 +56,21 @@ import java.io.ObjectOutputStream;
 
 public class MainActivity extends AppCompatActivity {
     private Button btnSignIn, btnRegister;
+    private boolean signIn;
     private String emailGoogle;
+    private EditText emailSignIn;
     private EditText email;
+    private EditText name;
+    private EditText surname;
     private View rg_window;
     private static final int RC_SIGN_IN = 9001;
     private GoogleSignInClient mGoogleSignInClient;
+    private SignInClient client;
+    private BeginSignInRequest signInRequest;
     private GoogleApiClient mGoogleApiClient;
     private ActivityResultLauncher<Intent> signInLauncher;
-    RelativeLayout root;
-    String pathFile = "courrrrrrrr.bin";
+    private RelativeLayout root;
+    private String pathFile = "courrrrrrrr.bin";
     private Firm firm1;
     private Firm firm2;
     private Firm firm3;
@@ -267,8 +275,16 @@ public class MainActivity extends AppCompatActivity {
         if (result.isSuccess()) {
             GoogleSignInAccount account = result.getSignInAccount();
             // Получите информацию о пользователе, вошедшем через аккаунт Google
-            emailGoogle = account.getEmail();
-            email.setText(emailGoogle);
+            if (signIn){
+                emailGoogle = account.getEmail();
+                emailSignIn.setText(emailGoogle);
+            }
+            else {
+                email.setText(account.getEmail());
+                name.setText(account.getGivenName());
+                surname.setText(account.getFamilyName());
+            }
+
 
 
         } else {
@@ -326,8 +342,9 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void showSignInWindow() {
+        signIn = true;
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-                .requestIdToken(getString(R.string.google_client_id))
+                .requestIdToken(getString(R.string.web_client_id))
                 .requestEmail()
                 .build();
 
@@ -353,7 +370,7 @@ public class MainActivity extends AppCompatActivity {
         rg_window = inflater.inflate(R.layout.entry_window, null);
         dialog.setView(rg_window);
 
-        email = rg_window.findViewById(R.id.email_field);
+        emailSignIn = rg_window.findViewById(R.id.email_field);
         EditText pass = rg_window.findViewById(R.id.pass_field);
 
         dialog.setNegativeButton("Отменить", new DialogInterface.OnClickListener() {
@@ -365,7 +382,7 @@ public class MainActivity extends AppCompatActivity {
         dialog.setPositiveButton("Войти", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
-                if (inCorrectData(pass, email)){
+                if (inCorrectData(pass, emailSignIn)){
                     Snackbar.make(root, "Пароль или эл. почта введены неверно",
                             Snackbar.LENGTH_SHORT).show();
                     return;
@@ -439,6 +456,24 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void showRegisterWindow() {
+        signIn = false;
+        GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                .requestIdToken(getString(R.string.web_client_id))
+                .requestEmail()
+                .build();
+
+        mGoogleSignInClient = GoogleSignIn.getClient(this, gso);
+
+       /* SignInButton signInButton = rg_window.findViewById(R.id.sign_in_button);
+        signInButton.setSize(SignInButton.SIZE_STANDARD);*/
+
+
+        mGoogleApiClient = new GoogleApiClient.Builder(this)
+                .enableAutoManage(this, connectionResult -> {
+                    // Обработайте событие ошибки подключения
+                })
+                .addApi(Auth.GOOGLE_SIGN_IN_API, gso)
+                .build();
         AlertDialog.Builder dialog = new AlertDialog.Builder(this);
         dialog.setTitle("Регистрация");
         dialog.setMessage("Введите данные для регистрации");
@@ -448,10 +483,10 @@ public class MainActivity extends AppCompatActivity {
 
         CheckBox checkBox_car = rg_window.findViewById(R.id.check_car);
         CheckBox checkBox_docs = rg_window.findViewById(R.id.check_docs);
-        EditText email = rg_window.findViewById(R.id.email_field);
+        email = rg_window.findViewById(R.id.email_field);
         EditText pass = rg_window.findViewById(R.id.pass_field);
-        EditText name = rg_window.findViewById(R.id.name_field);
-        EditText surname = rg_window.findViewById(R.id.surname_field);
+        name = rg_window.findViewById(R.id.name_field);
+        surname = rg_window.findViewById(R.id.surname_field);
         EditText phone = rg_window.findViewById(R.id.phone_field);
 
         dialog.setNegativeButton("Отменить", new DialogInterface.OnClickListener() {
@@ -497,6 +532,15 @@ public class MainActivity extends AppCompatActivity {
             }
         });
         dialog.show();
+        SignInButton signInButton = rg_window.findViewById(R.id.sign_up_button);
+        signInButton.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View v){
+                signIn();
+
+            }
+        });
+
     }
 
 
